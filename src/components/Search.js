@@ -15,7 +15,12 @@ function Search() {
     const [user, setUser] = useState(null);
     const [errorMessage, setErrorMessage] = useState('');
 
-    const { register, watch, handleSubmit } = useForm();
+    const {
+        register,
+        watch,
+        handleSubmit,
+    } = useForm();
+
     const username = watch('username');
 
     const getUser = async (username) => {
@@ -26,22 +31,22 @@ function Search() {
                 setErrorMessage('');
             }
         } catch (error) {
-            if (error.response && error.response.status === 404) {
+            if (error.message.includes('404')) {
                 setErrorMessage("User not found");
             } else {
-                setErrorMessage("Some error occurred, try again");
+                setErrorMessage("Some error occured, try again");
             }
-            console.error(error);
+            console.log(error.message);
         }
-    };
+    }
 
-    const onSubmit = async (data) => {
-        if (!data.username.trim()) {
+    const onSubmit = async () => {
+        if (username.trim().length === 0) {
             setErrorMessage('Username cannot be empty');
             return;
         }
-        await getUser(data.username);
-    };
+        await getUser(username);
+    }
 
     useEffect(() => {
         if (user !== null) {
@@ -50,38 +55,30 @@ function Search() {
     }, [user, navigate, searchParams]);
 
     useEffect(() => {
-        if (username) {
-            setSearchParams({ username }, { replace: true });
-        }
+        setSearchParams({ username: username }, { replace: true });
     }, [username, setSearchParams]);
 
     return (
         <section className='search-content'>
             <div className='img-box'>
-                <img src={githubImage} alt='GitHub icon' />
+                <img src={githubImage} alt='github icon' />
             </div>
-            <p>Welcome to GitHub Finder</p>
+            <p>Welcome to Github Finder</p>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <input
                     type='text'
                     placeholder='Username'
-                    {...register('username', { required: "Username cannot be empty" })}
+                    {...register('username',
+                        {
+                            required: true,
+                        })}
                     autoComplete='off'
                 />
-                {errorMessage && <p className='message'>{errorMessage}</p>}
-                <button 
-                    style={{
-                        cursor: 'pointer',
-                        padding: '10px',
-                        backgroundColor: 'blue',
-                        color: 'whitesmoke'
-                    }}
-                >
-                    Search
-                </button>
+                <button style={{backgroundColor: 'blue', color: 'white', padding: '10px', borderRadius: '3px'}} type='submit'>Search</button>
+                <p className='message'>{errorMessage}</p>
             </form>
         </section>
-    );
+    )
 }
 
-export default Search;
+export default Search
