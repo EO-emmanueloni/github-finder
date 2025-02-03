@@ -40,7 +40,8 @@ function Search() {
         }
     }
 
-    const onSubmit = async () => {
+    const onSubmit = async (e) => {
+        e.preventDefault();
         if (username.trim().length === 0) {
             setErrorMessage('Username cannot be empty');
             return;
@@ -64,7 +65,7 @@ function Search() {
                 <img src={githubImage} alt='github icon' />
             </div>
             <p>Welcome to Github Finder</p>
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={handleSubmit(onSubmit)}> 
                 <input
                     type='text'
                     placeholder='Username'
@@ -75,6 +76,9 @@ function Search() {
                     autoComplete='off'
                 />
                 <p className='message'>{errorMessage}</p>
+                <button 
+                style={{cursor: 'pointer', padding: '10px', backgroundColor: 'blue', color: 'whitesmoke' } }
+                >Search</button>
             </form>
         </section>
     )
