@@ -15,12 +15,7 @@ function Search() {
     const [user, setUser] = useState(null);
     const [errorMessage, setErrorMessage] = useState('');
 
-    const {
-        register,
-        watch,
-        handleSubmit,
-    } = useForm();
-
+    const { register, watch, handleSubmit } = useForm();
     const username = watch('username');
 
     const getUser = async (username) => {
@@ -31,23 +26,22 @@ function Search() {
                 setErrorMessage('');
             }
         } catch (error) {
-            if (error.message.includes('404')) {
+            if (error.response && error.response.status === 404) {
                 setErrorMessage("User not found");
             } else {
-                setErrorMessage("Some error occured, try again");
+                setErrorMessage("Some error occurred, try again");
             }
-            console.log(error.message);
+            console.error(error);
         }
-    }
+    };
 
-    const onSubmit = async (e) => {
-        e.preventDefault();
-        if (username.trim().length === 0) {
+    const onSubmit = async (data) => {
+        if (!data.username.trim()) {
             setErrorMessage('Username cannot be empty');
             return;
         }
-        await getUser(username);
-    }
+        await getUser(data.username);
+    };
 
     useEffect(() => {
         if (user !== null) {
@@ -56,32 +50,38 @@ function Search() {
     }, [user, navigate, searchParams]);
 
     useEffect(() => {
-        setSearchParams({ username: username }, { replace: true });
+        if (username) {
+            setSearchParams({ username }, { replace: true });
+        }
     }, [username, setSearchParams]);
 
     return (
         <section className='search-content'>
             <div className='img-box'>
-                <img src={githubImage} alt='github icon' />
+                <img src={githubImage} alt='GitHub icon' />
             </div>
-            <p>Welcome to Github Finder</p>
-            <form onSubmit={handleSubmit(onSubmit)}> 
+            <p>Welcome to GitHub Finder</p>
+            <form onSubmit={handleSubmit(onSubmit)}>
                 <input
                     type='text'
                     placeholder='Username'
-                    {...register('username',
-                        {
-                            required: true,
-                        })}
+                    {...register('username', { required: "Username cannot be empty" })}
                     autoComplete='off'
                 />
-                <p className='message'>{errorMessage}</p>
+                {errorMessage && <p className='message'>{errorMessage}</p>}
                 <button 
-                style={{cursor: 'pointer', padding: '10px', backgroundColor: 'blue', color: 'whitesmoke' } }
-                >Search</button>
+                    style={{
+                        cursor: 'pointer',
+                        padding: '10px',
+                        backgroundColor: 'blue',
+                        color: 'whitesmoke'
+                    }}
+                >
+                    Search
+                </button>
             </form>
         </section>
-    )
+    );
 }
 
-export default Search
+export default Search;
